@@ -1,0 +1,34 @@
+# Daily snapshot of the live timeline; redeploys tardis when it changes.
+name: refresh
+on:
+  schedule:
+    - cron: '17 3 * * *' # 03:17 UTC
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: refresh
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      API_URL: https://api.zoocab.app/api/timeline
+      DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Fetch
+        run: |
+          curl -fsS --retry 3 "$API_URL" | jq . > timeline.tmp
+          jq -e '(.groups | type == "array" and length > 0) and (.items | type == "array" and length > 0)' timeline.tmp > /dev/null
+          mv timeline.tmp timeline.json
+      - name: Commit if changed
+        id: commit
+        run: |
+          git add timeline.json
+          if git diff --cached --quiet; then echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898583+github-actions[bot]@users.noreply.github.com' \
+            commit -m "data: $(jq '.groups | length' timeline.json) groups, $(jq '.items | length' timeline.json) items"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Redeploy tardis
+        if: steps.commit.outputs.changed == 'true' && env.DEPLOY_HOOK != ''
+        run: curl -fsS -X POST "$DEPLOY_HOOK" > /dev/null
