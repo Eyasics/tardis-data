@@ -1,7 +1,5 @@
 # tardis-data
 
-Created at 2026-10-08
-
 Daily snapshot of the [Tardis](https://tardis.hi-curio.com) history timeline
 
 - `timeline.json`: `{ groups, items }`. Years are astronomical (1 BCE = 0). Labels and notes are
