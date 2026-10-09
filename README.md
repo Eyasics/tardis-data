@@ -1,6 +1,6 @@
 # tardis-data
 
-Daily snapshot of the [Tardis](https://tardis.hi-curio.com) history timeline
+Daily snapshot of the interactive world history timeline: https://tardis.hi-curio.com
 
 - `timeline.json`: `{ groups, items }`. Years are astronomical (1 BCE = 0). Labels and notes are
   keyed by language name (`english`, `chinese`, `spanish`, …).
@@ -9,3 +9,4 @@ Daily snapshot of the [Tardis](https://tardis.hi-curio.com) history timeline
 
 Tardis builds its region pages (`/history/…`) from this file via `TIMELINE_URL`:
 https://raw.githubusercontent.com/Eyasics/tardis-data/main/timeline.json
+
